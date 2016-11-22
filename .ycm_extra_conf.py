@@ -2,8 +2,12 @@ import os
 import ycm_core
 
 flags = [
-    '-I',
-    './systemc/include'
+    '-std=c++14',
+    '-I', '/usr/bin/../lib/clang/3.8.0/include',
+    '-I', '/usr/include',
+    '-I', '/usr/include/c++/v1',
+    '-I', './systemc/include',
+    '-DUSE_CLANG_COMPLETER'
 ]
 
 compilation_database_folder = ''
