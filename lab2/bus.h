@@ -32,7 +32,7 @@ SC_MODULE(bus_t)
         sc_uint<32> addr(haddr_in.read());
         int selected_device = (addr <= 0x0000FFFF ? addr >> 12 : -1);
 
-        std::cout << "selected device: " << selected_device << std::endl;
+        std::cout << "selected device: " << selected_device + 1 << std::endl;
 
         for ( unsigned int i = 0; i < device_number; ++i)
             hsel_s[i].write(i != selected_device);

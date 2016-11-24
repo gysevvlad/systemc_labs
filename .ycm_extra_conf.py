@@ -7,6 +7,7 @@ flags = [
     '-I', '/usr/include',
     '-I', '/usr/include/c++/v1',
     '-I', './systemc/include',
+    '-I', '/usr/local/include',
     '-DUSE_CLANG_COMPLETER'
 ]
 
