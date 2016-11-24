@@ -46,6 +46,22 @@ int sc_main(int argc, char * argv[])
     CS = true;
     sc_start(10, SC_NS);
 
+    //SEND DATA (1)
+    CS = false;
+    HWRITE = true;
+    HADDR = 0x00000000;
+    HWDATA = 0xD5D5D5D5;
+    sc_start(10, SC_NS);
+
+    //WAIT READY
+    CS = true;
+    sc_start(200, SC_NS);
+    CS = false;
+    HWRITE = false;
+    HADDR = 0x00000000;
+    sc_start(10, SC_NS);
+    std::cout << decrypt_init(HRDATA.read()) << std::endl;
+
     //SEND DATA (2)
     CS = false;
     HWRITE = true;
