@@ -1,4 +1,5 @@
 #include "PmodOLEDController.h"
+#include "PmodOledStud.h"
 
 int sc_main(int argc, char * argv[]) 
 {
@@ -8,9 +9,12 @@ int sc_main(int argc, char * argv[])
 
     sc_signal< bool > SPI_CS, SPI_CLK, SPI_MOSI, DC;
 
-    PmodOLEDController<2> oled("PmodOLED");
+    PmodOLEDController<2> oled("PmodOledController");
     oled(CS, CLK, HWRITE, HWDATA, HADDR,    
             HRDATA, SPI_CS, SPI_CLK, SPI_MOSI, DC);
+
+    PmodOledStud stud("PmodOLED");
+    stud(SPI_CS, SPI_CLK, DC, SPI_MOSI);
 
     sc_trace_file * file_trace = sc_create_vcd_trace_file("spi");
     file_trace->set_time_unit(1.0, SC_PS);
