@@ -30,7 +30,11 @@ SC_MODULE(bus_t)
     void select_device() {
         // [0x00000000, 0x0000FFFF]     
         sc_uint<32> addr(haddr_in.read());
-        int selected_device = (addr <= 0x0000FFFF ? addr >> 12 : -1);
+        int selected_device = -1;
+        if (addr >= 0xFFFF0000) 
+            selected_device = (addr & 0x0000FFFF) >> 12;
+        else 
+            selected_device = -1;
 
         std::cout << "selected device: " << selected_device + 1 << std::endl;
 

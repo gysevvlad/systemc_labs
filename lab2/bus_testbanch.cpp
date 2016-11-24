@@ -34,7 +34,7 @@ int sc_main(int argc, char * argv[])
     s(hsel_s2);
 #undef s
 
-    haddr_in = 0xFFFFFFFF;
+    haddr_in = 0x00000000;
     hrdata_s1 = 0x11111111;
     hrdata_s2 = 0x22222222;
 
@@ -46,16 +46,16 @@ int sc_main(int argc, char * argv[])
     sc_start(10, SC_NS);
 
     hwrite_in = false;
-    haddr_in = 0x00000000;
+    haddr_in = 0xFFFF0000;
     sc_start(10, SC_NS);
 
     hrdata_s1 = 0x01010101;
     sc_start(10, SC_NS);
 
-    haddr_in = 0x00010000;
+    haddr_in = 0xFFFF1000;
     sc_start(10, SC_NS);
 
-    haddr_in = 0x00001000;
+    haddr_in = 0xFFFF2000;
     sc_start(10, SC_NS);
 
     sc_start(5, SC_NS);

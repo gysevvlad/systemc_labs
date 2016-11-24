@@ -1,0 +1,120 @@
+$date
+     Nov 25, 2016       01:27:12
+$end
+
+$version
+              SystemC 2.3.0_pub_rev_20111121-OSCI --- Nov 23 2016 00:48:04
+$end
+
+$timescale
+     1 ps
+$end
+
+$scope module SystemC $end
+$var wire    1  aaa  clk_in       $end
+$var wire   32  aab  hwdata_in [31:0]  $end
+$var wire    1  aac  clk_out       $end
+$var wire   32  aad  hwdata_out [31:0]  $end
+$var wire    1  aae  hwrite_out       $end
+$var wire   32  aaf  hrdata_out [31:0]  $end
+$var wire    1  aag  hwrite_in       $end
+$var wire   32  aah  hrdata_s1 [31:0]  $end
+$var wire   32  aai  haddr_in [31:0]  $end
+$var wire   32  aaj  hrdata_s2 [31:0]  $end
+$var wire   32  aak  haddr_out [31:0]  $end
+$var wire    1  aal  hsel_s1       $end
+$var wire    1  aam  hsel_s2       $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+1aaa
+b0 aab
+1aac
+b0 aad
+0aae
+b0 aaf
+0aag
+b10001000100010001000100010001 aah
+b0 aai
+b100010001000100010001000100010 aaj
+b0 aak
+1aal
+1aam
+$end
+
+#5000
+0aaa
+0aac
+
+#10000
+1aaa
+b1011010010110100101101001011010 aab
+1aac
+b1011010010110100101101001011010 aad
+1aae
+1aag
+b10100101101001011010010110100101 aai
+b10100101101001011010010110100101 aak
+
+#15000
+0aaa
+0aac
+
+#20000
+1aaa
+1aac
+0aae
+b10001000100010001000100010001 aaf
+0aag
+b11111111111111110000000000000000 aai
+b11111111111111110000000000000000 aak
+0aal
+
+#25000
+0aaa
+0aac
+
+#30000
+1aaa
+1aac
+b1000000010000000100000001 aaf
+b1000000010000000100000001 aah
+
+#35000
+0aaa
+0aac
+
+#40000
+1aaa
+1aac
+b100010001000100010001000100010 aaf
+b11111111111111110001000000000000 aai
+b11111111111111110001000000000000 aak
+1aal
+0aam
+
+#45000
+0aaa
+0aac
+
+#50000
+1aaa
+1aac
+b0 aaf
+b11111111111111110010000000000000 aai
+b11111111111111110010000000000000 aak
+1aam
+
+#55000
+0aaa
+0aac
+
+#60000
+1aaa
+1aac
+
