@@ -19,6 +19,8 @@ int sc_main(int argc, char * argv[])
     sc_trace_file * file_trace = sc_create_vcd_trace_file("spi");
     file_trace->set_time_unit(1.0, SC_PS);
 #define s(name) sc_trace(file_trace, name, #name) 
+    s(HWRITE);  s(HWDATA);
+    s(HADDR);   s(HRDATA);
     s(CLK);     s(SPI_CS);
     s(SPI_CLK); s(SPI_MOSI);
     s(CS);      s(DC);

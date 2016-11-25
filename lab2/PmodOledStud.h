@@ -16,7 +16,7 @@ SC_MODULE(PmodOledStud) {
 
             while(!CS.read()) {
                 for( int i = 0; i < 8; i++) {
-                    WAIT_UNTIL(CLK.read() == 1);
+                    wait();
                     data >>= 1;
                     data[7] = MOIS.read();
                 }

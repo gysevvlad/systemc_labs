@@ -36,7 +36,7 @@ SC_MODULE(bus_t)
         else 
             selected_device = -1;
 
-        std::cout << "selected device: " << selected_device + 1 << std::endl;
+        //std::cout << "selected device: " << selected_device + 1 << std::endl;
 
         for ( unsigned int i = 0; i < device_number; ++i)
             hsel_s[i].write(i != selected_device);

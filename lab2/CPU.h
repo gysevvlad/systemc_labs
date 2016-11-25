@@ -1,4 +1,5 @@
 #include <systemc.h>
+#include "PmodOLEDController.h"
 
 SC_MODULE(CPU) {
     sc_in< bool >         CLK;
@@ -9,7 +10,9 @@ SC_MODULE(CPU) {
 
     void clock();
 
-    SC_CTOR(CPU) {
+    bool finish;
+
+    SC_CTOR(CPU) : finish(false) {
         SC_CTHREAD(clock, CLK.pos());
     }
 };
@@ -17,6 +20,21 @@ SC_MODULE(CPU) {
 void CPU::clock() {
     //init
     wait();
+
+    HWRITE = 1;
+    HADDR = 0xFFFF0006;
+    HWDATA = 0x44332211;
+    wait();
+
+    HWRITE = 0;
+    HADDR = 0xFFFF0000;
+    wait();
+    do {
+        wait();
+        //std::cout << decrypt_init(HRDATA.read()) << std::endl;
+    } while (HRDATA.read()[0]);
+
+    finish = true;
 
     // ...
 }
