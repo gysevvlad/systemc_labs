@@ -32,22 +32,20 @@ int sc_main(int argc, char * argv[])
     //SEND DATA (1)
     CS = false;
     HWRITE = true;
-    HADDR = 0x00000000;
+    HADDR = 0xFFFF0000;
     HWDATA = 0xD5D5D5D5;
     sc_start(10, SC_NS);
 
     //WAIT READY
     HWRITE = false;
-    HADDR = 0x00000000;
-    sc_start(10, SC_NS);
-    do {
-        sc_start(10, SC_NS);
+    HADDR = 0xFFFF0000;
+    do { 
+        sc_start(10, SC_NS); 
         std::cout << decrypt_init(HRDATA.read()) << std::endl;
     } while(HRDATA.read()[0]);
-
+/*
     CS = true;
     sc_start(10, SC_NS);
-
     //SEND DATA (1)
     CS = false;
     HWRITE = true;
@@ -116,7 +114,7 @@ int sc_main(int argc, char * argv[])
 
     CS = true;
     sc_start(10, SC_NS);
-
+*/
     sc_start(5, SC_NS);
     sc_close_vcd_trace_file(file_trace);
     return 0;

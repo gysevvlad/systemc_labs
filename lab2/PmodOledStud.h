@@ -16,13 +16,14 @@ SC_MODULE(PmodOledStud) {
 
             while(!CS.read()) {
                 for( int i = 0; i < 8; i++) {
-                    wait();
+                    WAIT_UNTIL(CLK);
                     data >>= 1;
                     data[7] = MOIS.read();
                 }
                 std::cout << "PmodOledStud: recieved " 
                           << (DC.read()? "DATA " : "COMMAND ")
                           <<  std::hex << data << std::endl;
+                data = 0x00;
             }
         }
     }

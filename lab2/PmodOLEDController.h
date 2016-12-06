@@ -50,7 +50,9 @@ SC_MODULE(PmodOLEDController) {
         sc_uint<32> bytes;
         wait();
         while (true) {
+            std::cout << "CLK";
             if (state == State::READY && HWRITE.read() && !CS.read()) {
+                std::cout << " 1";
                 //SEND_DATA or SEND_COMMAND
                 state = State::TRANSACTION;
                 bytes = HADDR.read().range(3,1); 
@@ -70,15 +72,19 @@ SC_MODULE(PmodOLEDController) {
             } 
 
             if (state == State::TRANSACTION) {
+                std::cout << " 2";
                 if (clk % divider == 0) {
+                    std::cout << " a";
                     SPI_DOUT.write(data[0]);
                     data = data >> 1;
                 }
                 if (clk % (divider >> 1) == 0) {
+                    std::cout << " b";
                     SPI_CLK.write(spi_clk);
                     spi_clk = !spi_clk;
                 }
                 if (clk == 0) {
+                    std::cout << " c";
                     SPI_CS.write(true);
                     SPI_CLK.write(false);
                     SPI_DOUT.write(false);
@@ -88,16 +94,19 @@ SC_MODULE(PmodOLEDController) {
                     init = 0;
                 }
                 else {
+                    std::cout << " d";
                     clk--;
                     init.range(16, 8) = sc_uint<8>(clk);
                 }
             }
 
             if (!HWRITE.read() && !HADDR.read()[0] && !CS.read()) {
+                std::cout << " 3";
                 //GET_STATE
                 HRDATA.write(init);
             }
 
+            std::cout << std::endl;
             wait();
         }
     }
