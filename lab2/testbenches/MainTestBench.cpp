@@ -1,9 +1,9 @@
 #include <systemc>
 
-#include "CPU.h"
-#include "bus.h"
-#include "PmodOLEDController.h"
-#include "PmodOledStud.h"
+#include "../modules/Cpu.h"
+#include "../modules/Bus.h"
+#include "../modules/PmodOledController.h"
+#include "../modules/PmodOledStud.h"
 
 int sc_main(int argc, char * argv[])
 {

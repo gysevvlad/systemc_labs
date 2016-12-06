@@ -1,6 +1,7 @@
-#include <systemc.h>
-#include "PmodOLEDController.h"
+#pragma once
 
+#include <systemc.h>
+#include "PmodOledController.h"
 
 SC_MODULE(CPU) {
     sc_in< bool >         CLK;
