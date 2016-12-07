@@ -1,5 +1,5 @@
-#include "PmodOLEDController.h"
-#include "PmodOledStud.h"
+#include "../modules/PmodOledController.h"
+#include "../modules/PmodOledStud.h"
 
 int sc_main(int argc, char * argv[]) 
 {
@@ -7,14 +7,15 @@ int sc_main(int argc, char * argv[])
     sc_signal< bool > HWRITE, CS;
     sc_signal< sc_uint<32> > HWDATA, HADDR, HRDATA;
 
-    sc_signal< bool > SPI_CS, SPI_CLK, SPI_MOSI, DC;
+    sc_signal< bool > SPI_CS, SPI_CLK, SPI_MOSI, DC, SPI_MISO;
 
     PmodOLEDController<2> oled("PmodOledController");
     oled(CS, CLK, HWRITE, HWDATA, HADDR,    
-            HRDATA, SPI_CS, SPI_CLK, SPI_MOSI, DC);
+            HRDATA, SPI_CS, SPI_CLK, SPI_MOSI, DC, SPI_MISO);
 
     PmodOledStud stud("PmodOLED");
-    stud(SPI_CS, SPI_CLK, DC, SPI_MOSI);
+    stud(SPI_CS, SPI_CLK, DC, SPI_MOSI, SPI_MISO);
+    stud.data.push(0xA5);
 
     sc_trace_file * file_trace = sc_create_vcd_trace_file("spi");
     file_trace->set_time_unit(1.0, SC_PS);
@@ -24,97 +25,73 @@ int sc_main(int argc, char * argv[])
     s(CLK);     s(SPI_CS);
     s(SPI_CLK); s(SPI_MOSI);
     s(CS);      s(DC);
+    s(SPI_MISO);
 #undef s
 
     CS = true;
     sc_start(10, SC_NS);
 
-    //SEND DATA (1)
+    /* reset */
     CS = false;
     HWRITE = true;
-    HADDR = 0xFFFF0000;
-    HWDATA = 0xD5D5D5D5;
+    HADDR = 0xFFFF0002;
     sc_start(10, SC_NS);
 
-    //WAIT READY
-    HWRITE = false;
-    HADDR = 0xFFFF0000;
-    do { 
-        sc_start(10, SC_NS); 
-        std::cout << decrypt_init(HRDATA.read()) << std::endl;
-    } while(HRDATA.read()[0]);
-/*
-    CS = true;
-    sc_start(10, SC_NS);
-    //SEND DATA (1)
+    /* set data */
     CS = false;
     HWRITE = true;
-    HADDR = 0x00000000;
-    HWDATA = 0xD5D5D5D5;
+    HADDR = 0x5;
     sc_start(10, SC_NS);
 
-    //WAIT READY
-    CS = true;
-    sc_start(200, SC_NS);
-    CS = false;
-    HWRITE = false;
-    HADDR = 0x00000000;
-    sc_start(10, SC_NS);
-    std::cout << decrypt_init(HRDATA.read()) << std::endl;
-
-    //SEND DATA (2)
+    /* transact */
     CS = false;
     HWRITE = true;
-    HADDR = 0x00000003;
-    HWDATA = 0xD5D5D5D5;
+    HWDATA = 0x12000000;
+    HADDR = 0x01;
     sc_start(10, SC_NS);
 
+    /* get state */
+    CS = false;
     HWRITE = false;
-    HADDR = 0x00000000;
+    HADDR = 0x0;
     do {
         sc_start(10, SC_NS);
-        std::cout << decrypt_init(HRDATA.read()) << std::endl;
-    } while (HRDATA.read()[0]);
+    } while (!HRDATA.read()[0]);
 
-    CS = true;
+    /* get data */
+    CS = false;
+    HWRITE = false;
+    HADDR = 0x4;
     sc_start(10, SC_NS);
 
-    //SEND DATA (3)
+
+    /* set data */
     CS = false;
     HWRITE = true;
-    HADDR = 0x00000004;
-    HWDATA = 0xD5D5D5D5;
+    HADDR = 0x3;
     sc_start(10, SC_NS);
-
-    //WAIT READY
-    HWRITE = false;
-    HADDR = 0x00000000;
-    do {
-        sc_start(10, SC_NS);
-        std::cout << decrypt_init(HRDATA.read()) << std::endl;
-    } while(HRDATA.read()[0]);
-
-    CS = true;
-    sc_start(10, SC_NS);
-
-    //SEND DATA (4 bytes)
+   
+    /* transact */
     CS = false;
     HWRITE = true;
-    HADDR = 0x00000007;
-    HWDATA = 0xD5D5D5D5;
+    HWDATA = 0x34000000;
+    HADDR = 0x01;
     sc_start(10, SC_NS);
 
-    //WAIT READY
+    /* get state */
+    CS = false;
     HWRITE = false;
-    HADDR = 0x00000000;
+    HADDR = 0x0;
     do {
         sc_start(10, SC_NS);
-        std::cout << decrypt_init(HRDATA.read()) << std::endl;
-    } while(HRDATA.read()[0]);
+    } while (!HRDATA.read()[0]);
 
-    CS = true;
+    /* get data */
+    CS = false;
+    HWRITE = false;
+    HADDR = 0x4;
     sc_start(10, SC_NS);
-*/
+
     sc_start(5, SC_NS);
     sc_close_vcd_trace_file(file_trace);
     return 0;

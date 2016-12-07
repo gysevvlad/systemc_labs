@@ -2,22 +2,6 @@
 
 #include <systemc.h>
 
-/*
- *  HWRITE HADDR[0:4] COMMAND
- *       0       0000 GET_STATE   
- *       0       0001 RESET
- *       1       0XX0 SEND_DATA
- *       1       0XX1 SEND_COMMAND
- *
- *  INIT[0]    0 READY
- *  INIT[0]    1 TRANSACT
- *  INIT[1]    1 DATA
- *  INIT[1]    0 COMMAND
- *  INIT[2:3] 00 1 byte
- *  INIT[2:3] 01 2 byte
- *  INIT[2:3] 10 3 byte
- *  INIT[2:3] 11 4 byte
- */
 template< unsigned int divider >
 SC_MODULE(PmodOLEDController) {
     sc_in< bool >         CS;
@@ -32,82 +16,91 @@ SC_MODULE(PmodOLEDController) {
     sc_out< bool > SPI_DOUT;
     sc_out< bool > DC;
 
-    sc_uint<32> data;
-    sc_uint<32> init;
+    sc_in< bool > SPI_MISO;
+
+    sc_uint<32> m_data;
+    sc_uint<32> m_state;
 
     enum class State {
-        TRANSACTION = 00,
-        READY       = 01
-    } state;
+        TRANSACTION = 0,
+        READY       = 1
+    };
+
+    void setState( State state ) { m_state[0] = state == State::READY; }
+    void setD() { m_state[1] = true; }
+    void setC() { m_state[1] = false; }
 
     void clk() {
+        State state = State::READY;
         SPI_CS.write(true);
-        state = State::READY;
-        init = 0x00000000;
-        int sclk, clk;
         bool spi_clk;
-        int byte_count;
-        sc_uint<32> bytes;
-        wait();
-        while (true) {
-            std::cout << "CLK";
-            if (state == State::READY && HWRITE.read() && !CS.read()) {
-                std::cout << " 1";
-                //SEND_DATA or SEND_COMMAND
-                state = State::TRANSACTION;
-                bytes = HADDR.read().range(3,1); 
-                data = HWDATA.read();
-                clk = (bytes + 1) * divider * 8;
-                spi_clk = false;
+        int clk;
 
-                //INIT PORTS
-                SPI_CS = false;
-
-                //INIT UPDATE
-                init[0] = true;
-                init[1] = HADDR.read()[0];
-                init[2] = HADDR.read()[1];
-                init[3] = HADDR.read()[2];
-                DC.write(init[1]);
-            } 
+        while( true ) {
+            wait();
 
             if (state == State::TRANSACTION) {
-                std::cout << " 2";
-                if (clk % divider == 0) {
-                    std::cout << " a";
-                    SPI_DOUT.write(data[0]);
-                    data = data >> 1;
-                }
+                SPI_CS.write(false);
+                DC.write(m_state[1]);
                 if (clk % (divider >> 1) == 0) {
-                    std::cout << " b";
                     SPI_CLK.write(spi_clk);
                     spi_clk = !spi_clk;
                 }
-                if (clk == 0) {
-                    std::cout << " c";
-                    SPI_CS.write(true);
-                    SPI_CLK.write(false);
-                    SPI_DOUT.write(false);
-                    DC.write(false);
-                    state = State::READY;
-                    init[0] = (state == State::TRANSACTION);
-                    init = 0;
+                if (clk != 0) {
+                    if (clk % divider == 0) {
+                        SPI_DOUT.write(m_data[31]);
+                        m_data <<= 1;
+                    }
+                    if (clk % divider == divider >> 1) {
+                        m_data[0] = SPI_MISO.read();
+                    }
+                    clk--;
                 }
                 else {
-                    std::cout << " d";
-                    clk--;
-                    init.range(16, 8) = sc_uint<8>(clk);
+                    state = State::READY;
+                    setState(State::READY);
+                    SPI_CS.write(true);
+                }
+            }
+            
+            if (CS.read()) continue;
+
+            if (HWRITE.read() && (HADDR.read() & 0x00000007) == 2) {
+                /* reset */
+                state = State::READY;
+                spi_clk =  false;
+                setState(state);
+                m_data = 0;
+                clk = 0;
+                setC();
+            }
+ 
+            if (HWRITE.read() && state == State::READY) {
+                if ((HADDR.read() & 0x00000007) == 1) {
+                    /* transact */
+                    state = State::TRANSACTION;
+                    setState(state);
+                    auto bytes = HADDR.read().range(6, 4) + 1;
+                    clk = bytes * divider * 8;
+                    m_data = HWDATA.read();
+                    spi_clk = false;
+                }  
+                if ((HADDR.read() & 0x00000007) == 5) {
+                    setD();
+                }
+                if ((HADDR.read() & 0x00000007) == 3) {
+                    setC();
                 }
             }
 
-            if (!HWRITE.read() && !HADDR.read()[0] && !CS.read()) {
-                std::cout << " 3";
-                //GET_STATE
-                HRDATA.write(init);
+            if (!HWRITE.read()) {
+                if ((HADDR.read() & 0x0000000F) == 4) {
+                    HRDATA.write( m_data );
+                }
+                if ((HADDR.read() & 0x0000000F) == 0) {
+                    HRDATA.write( m_state );
+                }
             }
-
-            std::cout << std::endl;
-            wait();
         }
     }
 
@@ -132,5 +125,3 @@ std::string decrypt_init(const sc_uint<32> & init) {
     }
     return str;
 }
-
-

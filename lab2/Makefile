@@ -1,5 +1,24 @@
 
 all : main
+	
+
+controller :
+	[ -d objdir ] || mkdir objdir
+	cd objdir && \
+	echo $(PWD) && \
+	clang++ -I ../../systemc/include -L ../../systemc/lib-freebsd64 \
+		-I .. -Alsystemc ../testbenches/PmodOledControllerTestBench.cpp \
+		-lsystemc --std=c++11 -o controller
+
+
+spi :
+	[ -d objdir ] || mkdir objdir
+	cd objdir && \
+	echo $(PWD) && \
+	clang++ -I ../../systemc/include -L ../../systemc/lib-freebsd64 \
+		-I .. -Alsystemc ../testbenches/SpiTestBench.cpp -lsystemc \
+		--std=c++11 -o spi
+
 
 main : modules/*.cpp modukes/*.h testbenches/MainTestBench.cpp
 	[ -d objdir ] || mkdir objdir
