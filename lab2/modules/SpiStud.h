@@ -30,6 +30,8 @@ SC_MODULE(PmodOledStud) {
                 std::cout << "PmodOledStud: recieved " 
                           << (DC.read()? "DATA " : "COMMAND ")
                           <<  std::hex << data.front() << std::endl;
+                data.push(data.front());
+                data.pop();
             }
         }
     }
