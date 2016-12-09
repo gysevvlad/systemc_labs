@@ -35,6 +35,7 @@ SC_MODULE(PmodOLEDController) {
         SPI_CS.write(true);
         bool spi_clk;
         int clk;
+        m_data = 0xA5A5A5A5;
 
         while( true ) {
             wait();
@@ -57,6 +58,7 @@ SC_MODULE(PmodOLEDController) {
                     clk--;
                 }
                 else {
+                    //std::cout << "PmodOLEDController: end transaction" << std::endl;
                     state = State::READY;
                     setState(State::READY);
                     SPI_CS.write(true);
@@ -77,6 +79,7 @@ SC_MODULE(PmodOLEDController) {
  
             if (HWRITE.read() && state == State::READY) {
                 if ((HADDR.read() & 0x00000007) == 1) {
+                    //std::cout << "PmodOLEDController: start transaction" << std::endl;
                     /* transact */
                     state = State::TRANSACTION;
                     setState(state);
@@ -86,18 +89,22 @@ SC_MODULE(PmodOLEDController) {
                     spi_clk = false;
                 }  
                 if ((HADDR.read() & 0x00000007) == 5) {
+                    //std::cout << "PmodOLEDController: set D flag" << std::endl;
                     setD();
                 }
                 if ((HADDR.read() & 0x00000007) == 3) {
+                    //std::cout << "PmodOLEDController: set C flag" << std::endl;
                     setC();
                 }
             }
 
             if (!HWRITE.read()) {
                 if ((HADDR.read() & 0x0000000F) == 4) {
+                    //std::cout << "data" << std::endl;
                     HRDATA.write( m_data );
                 }
-                if ((HADDR.read() & 0x0000000F) == 0) {
+                if ((HADDR.read() & 0x0000000F) == 8) {
+                    //std::cout << "state" << std::endl;
                     HRDATA.write( m_state );
                 }
             }

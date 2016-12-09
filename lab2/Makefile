@@ -20,13 +20,13 @@ spi :
 		--std=c++11 -o spi
 
 
-main : modules/*.cpp modukes/*.h testbenches/MainTestBench.cpp
+main : modules/*.cpp modules/*.h testbenches/MainTestBench.cpp
 	[ -d objdir ] || mkdir objdir
 	cd objdir && \
 	echo $(PWD) && \
-	clang++ -I ../../systemc/include -L ../../systemc/lib-freebsd64 \
+	clang++ -w -I ../../systemc/include -L ../../systemc/lib-freebsd64 \
 		-I .. -Alsystemc ../testbenches/MainTestBench.cpp -lsystemc \
-		--std=c++11 -o main
+		--std=c++11 -o main ../modules/*.cpp
 
 systemc : ../systemc/libsystemc.a ../systemc/libsystemc.la
 	

@@ -3,7 +3,7 @@
 #include <systemc.h>
 #include <queue>
 
-SC_MODULE(PmodOledStud) {
+SC_MODULE(SpiStud) {
     sc_in< bool > CS;
     sc_in< bool > CLK;
     sc_in< bool > DC;
@@ -27,8 +27,7 @@ SC_MODULE(PmodOledStud) {
                     WAIT_UNTIL(!CLK);
                     MISO.write(data.front()[7]);
                 }
-                std::cout << "PmodOledStud: recieved " 
-                          << (DC.read()? "DATA " : "COMMAND ")
+                std::cout << "SpiSlaveStud: recieved "
                           <<  std::hex << data.front() << std::endl;
                 data.push(data.front());
                 data.pop();
@@ -36,7 +35,7 @@ SC_MODULE(PmodOledStud) {
         }
     }
 
-    SC_CTOR(PmodOledStud) {
+    SC_CTOR(SpiStud) : data({0x00}) {
         SC_THREAD(run)
             sensitive << CS << CLK.pos() << CLK.neg();
     }

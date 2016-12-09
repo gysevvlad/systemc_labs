@@ -1,5 +1,5 @@
 #include "../modules/PmodOledController.h"
-#include "../modules/PmodOledStud.h"
+#include "../modules/SpiStud.h"
 
 int sc_main(int argc, char * argv[]) 
 {
@@ -13,9 +13,11 @@ int sc_main(int argc, char * argv[])
     oled(CS, CLK, HWRITE, HWDATA, HADDR,    
             HRDATA, SPI_CS, SPI_CLK, SPI_MOSI, DC, SPI_MISO);
 
-    PmodOledStud stud("PmodOLED");
+    SpiStud stud("SpiStud");
     stud(SPI_CS, SPI_CLK, DC, SPI_MOSI, SPI_MISO);
-    stud.data.push(0xA5);
+    stud.data.push(0x11);
+    stud.data.push(0x22);
+    stud.data.push(0x33);
 
     sc_trace_file * file_trace = sc_create_vcd_trace_file("spi");
     file_trace->set_time_unit(1.0, SC_PS);
@@ -63,7 +65,6 @@ int sc_main(int argc, char * argv[])
     HWRITE = false;
     HADDR = 0x4;
     sc_start(10, SC_NS);
-
 
     /* set data */
     CS = false;

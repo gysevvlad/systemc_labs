@@ -3,13 +3,16 @@
 #include "../modules/Cpu.h"
 #include "../modules/Bus.h"
 #include "../modules/PmodOledController.h"
+#include "../modules/SpiStud.h"
 #include "../modules/PmodOledStud.h"
+#include "../modules/Switch.h"
 
 int sc_main(int argc, char * argv[])
 {
     sc_clock CLK("CLK", 10, SC_NS);
     sc_signal< sc_uint<32> > HADDR, HRDATA_S1, HRDATA_S2, HRDATA, HWDATA;
-    sc_signal< bool > HSEL_S1, HSEL_S2, HWRITE, SPI_CS, SPI_CLK, SPI_DOUT, DC;
+    sc_signal< bool > HSEL_S1, HSEL_S2, HWRITE, SPI_CS, 
+        SPI_CLK, SPI_DOUT, DC, SPI_MISO;
 
     bus_t<2> bus("Bus");
     bus(HADDR, HRDATA_S1, HRDATA_S2, HRDATA, HSEL_S1, HSEL_S2);
@@ -19,7 +22,10 @@ int sc_main(int argc, char * argv[])
 
     PmodOLEDController<2> controller("PmodOledController");
     controller(HSEL_S1, CLK, HWRITE, HWDATA, HADDR, HRDATA_S1,
-            SPI_CS, SPI_CLK, SPI_DOUT, DC);
+            SPI_CS, SPI_CLK, SPI_DOUT, DC, SPI_MISO);
+
+    Switch switcher("Switch");
+    switcher(HSEL_S2, CLK, HWRITE, HWDATA, HADDR, HRDATA_S2);
 
     PmodOledStud pmodOledStud("PmodOledStud");
     pmodOledStud(SPI_CS, SPI_CLK, DC, SPI_DOUT);
